@@ -1,0 +1,6 @@
+    CONST 1
+    BRANCHIFNOT L
+    CONST 2
+    BRANCH M
+L:  CONST 3
+M:  STOP
