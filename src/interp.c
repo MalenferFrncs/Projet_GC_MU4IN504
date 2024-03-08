@@ -98,19 +98,31 @@ mlvalue caml_interprete(code_t* prog) {
       break;
 
     case APPLY: {
-      uint64_t n = prog[pc++];
+      uint64_t n = prog[pc++]; /*
       mlvalue* tmp = malloc(n * sizeof(mlvalue)); // TODO: remove malloc
       for (uint64_t i = 0; i < n; i++) {
         tmp[i] = POP_STACK();
-      }
+      } 
       PUSH_STACK(env);
       PUSH_STACK(Val_long(pc));
       PUSH_STACK(Val_long(extra_args));
-      /* push in reverse order to keep the initial order */
+      /* push in reverse order to keep the initial order 
       for (int i = n-1; i >= 0; i--) {
         PUSH_STACK(tmp[i]);
+      } 
+      free(tmp);  */
+      if(sp+3 > Stack_size){
+        printf("stack overflow\n");
+        return EXIT_FAILURE;
       }
-      free(tmp);
+      uint64_t sp_val = sp-1;
+      for(uint64_t i=0;i<n; i++){
+        stack[sp_val-i+3] = stack[sp_val-i];
+      }
+      stack[sp-n] = env;
+      stack[sp-n+1] = Val_long(pc);
+      stack[sp-n+2] = Val_long(extra_args);
+      sp = sp+3;
       pc = Addr_closure(accu);
       env = Env_closure(accu);
       extra_args = n-1;
@@ -119,7 +131,7 @@ mlvalue caml_interprete(code_t* prog) {
 
     case APPTERM: {
       uint64_t n = prog[pc++];
-      uint64_t m = prog[pc++];
+      uint64_t m = prog[pc++]; /*
       mlvalue* tmp = malloc(n * sizeof(mlvalue)); // TODO: remove malloc
       for (uint64_t i = 0; i < n; i++) {
         tmp[i] = POP_STACK();
@@ -127,11 +139,18 @@ mlvalue caml_interprete(code_t* prog) {
       for (uint64_t i = 0; i < m-n; i++) {
         POP_STACK();
       }
-      /* push in reverse order to keep the initial order */
+      /* push in reverse order to keep the initial order 
       for (int i = n-1; i >= 0; i--) {
         PUSH_STACK(tmp[i]);
       }
-      free(tmp);
+      free(tmp);  */
+
+      
+      uint64_t base = sp-n-(m-n); /*plancher des adresses*/
+      for(int64_t i=0;i<n;i++){
+        stack[base+i] = stack[sp-n+i];
+      }
+      sp = sp-(m-n);
       pc = Addr_closure(accu);
       env = Env_closure(accu);
       extra_args += n-1;
