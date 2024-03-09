@@ -4,5 +4,6 @@
 #include "mlvalues.h"
 
 mlvalue caml_interprete(code_t* prog);
+extern unsigned int sp;
 
 #endif /* _INTERP_H */

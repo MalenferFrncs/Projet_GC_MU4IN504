@@ -12,4 +12,6 @@ void caml_init_domain() {
   Caml_state = malloc(sizeof(caml_domain_state));
 
   Caml_state->stack = malloc(Stack_size);
+
+  Caml_state->heap = malloc(Heap_size);
 }

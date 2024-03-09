@@ -7,6 +7,8 @@
 typedef struct _caml_domain_state {
   /* Stack */
   mlvalue* stack;
+  /* Heap */
+  mlvalue* heap;
 
 } caml_domain_state;
 

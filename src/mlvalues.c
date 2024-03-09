@@ -3,9 +3,12 @@
 #include <string.h>
 
 #include "mlvalues.h"
+#include "domain_state.h"
 #include "alloc.h"
 #include "instruct.h"
 #include "primitives.h"
+
+uint64_t heap_free = 0; 
 
 mlvalue make_empty_block(tag_t tag) {
   mlvalue* block = caml_alloc(sizeof(mlvalue));
@@ -14,7 +17,8 @@ mlvalue make_empty_block(tag_t tag) {
 }
 
 mlvalue make_block(size_t size, tag_t tag) {
-  mlvalue* block = caml_alloc((size+1) * sizeof(mlvalue));
+  mlvalue* block = Caml_state->heap+heap_free;
+  heap_free+=size;
   block[0] = Make_header(size, WHITE, tag);
   return Val_ptr(block+1);
 }
