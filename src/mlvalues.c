@@ -18,7 +18,7 @@ mlvalue make_empty_block(tag_t tag) {
 
 mlvalue make_block(size_t size, tag_t tag) {
   mlvalue* block = Caml_state->heap+heap_free;
-  heap_free+=size;
+  heap_free+=(size+1);
   block[0] = Make_header(size, WHITE, tag);
   return Val_ptr(block+1);
 }
