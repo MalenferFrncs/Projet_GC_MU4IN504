@@ -6,7 +6,7 @@
 typedef int64_t mlvalue;
 typedef uint64_t header_t;
 typedef enum { WHITE, GRAY, BLACK } color_t;
-typedef enum { ENV_T, CLOSURE_T, BLOCK_T } tag_t;
+typedef enum { BLOCK_T  ,CLOSURE_T,ENV_T} tag_t;
 
 /* If a mlvalue ends with 1, it's an integer, otherwise it's a pointer. */
 #define Is_long(v)  (((v) & 1) != 0)

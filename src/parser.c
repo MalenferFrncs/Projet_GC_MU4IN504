@@ -48,6 +48,7 @@ int label_addr(lbl_list* l, char* label) {
 void free_labels(lbl_list* l) {
   while (l) {
     lbl_list* next = l->next;
+    free(l->label); /*free les labels alloué par strdup */
     free(l);
     l = next;
   }
@@ -103,7 +104,7 @@ code_t* assemble(ua_code_t* ua_code, lbl_list* labels,
 
   free(ua_code);
   free_labels(labels);
-
+  
   return code;
 }
 
@@ -225,6 +226,6 @@ code_t* parse(char* filename) {
                                        .arg2 = arg2 };
     code_size++;
   }
-
+  fclose(f); /* fermer le fichier */
   return assemble(code, labels, instr_count, code_size);
 }

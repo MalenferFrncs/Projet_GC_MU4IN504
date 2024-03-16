@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -g
-OBJS = alloc.o interp.o minizam.o mlvalues.o parser.o primitives.o domain.o
+OBJS = debug.o alloc.o interp.o minizam.o mlvalues.o parser.o primitives.o domain.o
 
 all: minizam
 

@@ -8,23 +8,24 @@
 #include "instruct.h"
 #include "primitives.h"
 
-uint64_t heap_free = 0; 
+
 
 mlvalue make_empty_block(tag_t tag) {
-  mlvalue* block = caml_alloc(sizeof(mlvalue));
+  if(tag==ENV_T){printf("on demande un env de taille %d\n",0);}
+  mlvalue* block = caml_alloc(1);
   block[0] = Make_header(0, WHITE, tag);
   return Val_ptr(block+1);
 }
 
-mlvalue make_block(size_t size, tag_t tag) {
-  mlvalue* block = Caml_state->heap+heap_free;
-  heap_free+=(size+1);
+mlvalue make_block(size_t size, tag_t tag)  {
+  if(tag==ENV_T){printf("on demande un env de taille %d\n",size);}
+  mlvalue* block = caml_alloc(size+1);
   block[0] = Make_header(size, WHITE, tag);
   return Val_ptr(block+1);
 }
 
 mlvalue make_closure(uint64_t addr, mlvalue env) {
-  mlvalue* block = caml_alloc(3 * sizeof(mlvalue));
+  mlvalue* block = caml_alloc(3);
   block[0] = Make_header(2, WHITE, CLOSURE_T);
   block[1] = Val_long(addr);
   block[2] = env;
