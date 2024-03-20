@@ -11,14 +11,14 @@
 
 
 mlvalue make_empty_block(tag_t tag) {
-  if(tag==ENV_T){printf("on demande un env de taille %d\n",0);}
+  //if(tag==ENV_T){printf("on demande un env de taille %d\n",0);}
   mlvalue* block = caml_alloc(1);
   block[0] = Make_header(0, WHITE, tag);
   return Val_ptr(block+1);
 }
 
 mlvalue make_block(size_t size, tag_t tag)  {
-  if(tag==ENV_T){printf("on demande un env de taille %d\n",size);}
+  //if(tag==ENV_T){printf("on demande un env de taille %d\n",size);}
   mlvalue* block = caml_alloc(size+1);
   block[0] = Make_header(size, WHITE, tag);
   return Val_ptr(block+1);
