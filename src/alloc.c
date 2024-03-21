@@ -164,9 +164,11 @@ void apply_new_addr(mlvalue ***tab_mem_addr,int64_t cpt_obj_mem,mlvalue* stack){
     if(Is_block(stack[i])){
       
       for(int j=0;j<cpt_obj_mem;j++){   /* recherche de la nouvel adresse du bloc pointé */
-        
-        if(stack[i]==(tab_mem_addr)[0][j]){
-          stack[i] = (tab_mem_addr)[1][j];
+        //printf("(((mlvalue*)stack[i])-1): 0x%lx,stack[i] : 0x%lx,(tab_mem_addr)[0][j]) : 0x%lx,(((tab_mem_addr)[1][j])-1) : 0x%lx\n",(((mlvalue*)stack[i])-1),stack[i],(tab_mem_addr)[0][j],(((tab_mem_addr)[1][j])-1) );
+        if((((mlvalue*)stack[i])-1)==(tab_mem_addr)[0][j]){
+          stack[i] = (((tab_mem_addr)[1][j])+1);
+           
+          //printf("stack is modified\n");
           break;
         }
       }
@@ -185,8 +187,9 @@ void apply_new_addr(mlvalue ***tab_mem_addr,int64_t cpt_obj_mem,mlvalue* stack){
       for(int64_t i=0;i<size;i++){ /* parcours des valeurs du bloc */
         if(Is_block((heap_pointer+1)[i])){ /* si on a un pointeur dans le bloc */
           for(int j=0;j<cpt_obj_mem;j++){   /* recherche de la nouvel adresse du bloc pointé */
-            if((heap_pointer+1)[i]==(tab_mem_addr)[0][j]){ /* old addr */
-              (heap_pointer+1)[i] = (tab_mem_addr)[1][j]; /* new addr */
+            if(((mlvalue*)(heap_pointer+1)[i])-1==(tab_mem_addr)[0][j]){ /* old addr */
+              (heap_pointer+1)[i] = ((tab_mem_addr)[1][j]+1); /* new addr */
+             
             }
           }
         }
@@ -204,13 +207,14 @@ void slide(mlvalue *** tab_mem_addr, int64_t nb_obj_mem){
   for(int64_t i=0;i<nb_obj_mem;i++){
     mlvalue* src = (tab_mem_addr)[0][i]; /* old addr */
     mlvalue* dst = (tab_mem_addr)[1][i]; /* new addr */
-    int64_t size = Size(src); /* taille du block */
+    int64_t size = Size_hd(*src); /* taille du block */
     if(src != dst){
       for(int64_t i=0;i<size;i++){
         dst[i]=src[i];        /*on fait passer tout les element du bloque a leur nouvelle adresse */
       }
     }
     set_color(Ptr_val(dst),WHITE); /* on repasse la couleur du block d'on le traitement est fini a blanc */
+    //printf("src : %p dst : %p size : %ld \n",src,dst,size);
   }
 }
 
@@ -242,7 +246,18 @@ void print_tab(mlvalue ***tab,int64_t taille){
 
 void mark_and_compact(){
   //printf("heap_free :%d\n",heap_free);
-  
+  #ifdef DEBUG
+  printf("Caml_state->accu=%s  Caml_state->sp=%d stack=[",
+             val_to_str(Caml_state->accu), Caml_state->sp);
+      if (Caml_state->sp > 0) {
+        printf("%s", val_to_str(Caml_state->stack[Caml_state->sp-1]));
+      }
+      for (int i = Caml_state->sp-2; i >= 0; i--) {
+        printf(";%s  0x%lx\n", val_to_str(Caml_state->stack[i]),Caml_state->stack[i]);
+      }
+      printf("]  Caml_state->env=%s\n", val_to_str(Caml_state->env));
+
+  #endif
   mlvalue * stack = Caml_state->stack;
   int64_t nb_obj_mem;
   //printf("Caml_state->heap addr : %p, stack addr :%p\n",Caml_state->heap,stack);
@@ -254,9 +269,17 @@ void mark_and_compact(){
   //print_tab(tab_mem_addr,nb_obj_mem);
   //printf("new heap_free :%d\n",heap_free);
   apply_new_addr(tab_mem_addr,nb_obj_mem,stack); /*compact P2 modification de toute les valeurs de la memoire vivante */
-  //printf("application new addr \n");
+  //printf("application new addr terminé\n");
+  #ifdef DEBUG
+  if (Caml_state->sp > 0) {
+        printf("%s", val_to_str(Caml_state->stack[Caml_state->sp-1]));
+      }
+      for (int i = Caml_state->sp-2; i >= 0; i--) {
+        printf(";%s  0x%lx\n", val_to_str(Caml_state->stack[i]),Caml_state->stack[i]);
+      }
+  #endif
   slide(tab_mem_addr,nb_obj_mem); /*compact P3 glissement de touts les bloques vers leur nouvelle addr*/
-  //printf("fin application \n");
+  //printf("fin slide \n");
   free_tab_addr(tab_mem_addr);
   
 }
