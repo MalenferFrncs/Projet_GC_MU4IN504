@@ -173,6 +173,7 @@ void apply_new_addr(mlvalue ***tab_mem_addr,int64_t cpt_obj_mem,mlvalue* stack){
         }
       }
     }
+        
   }  /* fin de la modif de la pile */
 
   //printf("fin modif pile\n");
@@ -199,7 +200,8 @@ void apply_new_addr(mlvalue ***tab_mem_addr,int64_t cpt_obj_mem,mlvalue* stack){
 
     heap_pointer += (size+1);
   }
-  if(Is_block(Caml_state->accu)){
+
+   if(Is_block(Caml_state->accu)){
       
       for(int j=0;j<cpt_obj_mem;j++){   /* recherche de la nouvel adresse du bloc pointé */
         //printf("(((mlvalue*)stack[i])-1): 0x%lx,stack[i] : 0x%lx,(tab_mem_addr)[0][j]) : 0x%lx,(((tab_mem_addr)[1][j])-1) : 0x%lx\n",(((mlvalue*)stack[i])-1),stack[i],(tab_mem_addr)[0][j],(((tab_mem_addr)[1][j])-1) );
@@ -211,7 +213,7 @@ void apply_new_addr(mlvalue ***tab_mem_addr,int64_t cpt_obj_mem,mlvalue* stack){
         }
       }
     }
-  if(Is_block(Caml_state->env)){
+    if(Is_block(Caml_state->env)){
       
       for(int j=0;j<cpt_obj_mem;j++){   /* recherche de la nouvel adresse du bloc pointé */
         //printf("(((mlvalue*)stack[i])-1): 0x%lx,stack[i] : 0x%lx,(tab_mem_addr)[0][j]) : 0x%lx,(((tab_mem_addr)[1][j])-1) : 0x%lx\n",(((mlvalue*)stack[i])-1),stack[i],(tab_mem_addr)[0][j],(((tab_mem_addr)[1][j])-1) );
@@ -269,6 +271,7 @@ void print_tab(mlvalue ***tab,int64_t taille){
 }
 
 void mark_and_compact(){
+  //printf("debut gc \n");
   //printf("heap_free :%d\n",heap_free);
   #ifdef DEBUG
   printf("Caml_state->accu=%s  Caml_state->sp=%d stack=[",
@@ -288,13 +291,18 @@ void mark_and_compact(){
   nb_obj_mem = mark(stack); /* mark */
   //printf("nb_obj :%ld\n",nb_obj_mem);
   mlvalue ***tab_mem_addr = make_tab_addr(nb_obj_mem);
+  //printf("avant\n");
   //print_tab(tab_mem_addr,nb_obj_mem);
   heap_free = calc_new_addr(tab_mem_addr,nb_obj_mem); /*compact P1 calcules les nvls addrs */ 
+  //printf("\n après \n");
   //print_tab(tab_mem_addr,nb_obj_mem);
   //printf("new heap_free :%d\n",heap_free);
   apply_new_addr(tab_mem_addr,nb_obj_mem,stack); /*compact P2 modification de toute les valeurs de la memoire vivante */
   //printf("application new addr terminé\n");
+  #define NOT
   #ifdef DEBUG
+    printf("Caml_state->accu=%lx  Caml_state->sp=%d stack=[",
+             (Caml_state->accu), Caml_state->sp);
   if (Caml_state->sp > 0) {
         printf("%s", val_to_str(Caml_state->stack[Caml_state->sp-1]));
       }
@@ -305,6 +313,7 @@ void mark_and_compact(){
   slide(tab_mem_addr,nb_obj_mem); /*compact P3 glissement de touts les bloques vers leur nouvelle addr*/
   //printf("fin slide \n");
   free_tab_addr(tab_mem_addr);
+  //printf("fin gc \n");
   
 }
 
