@@ -199,6 +199,30 @@ void apply_new_addr(mlvalue ***tab_mem_addr,int64_t cpt_obj_mem,mlvalue* stack){
 
     heap_pointer += (size+1);
   }
+  if(Is_block(Caml_state->accu)){
+      
+      for(int j=0;j<cpt_obj_mem;j++){   /* recherche de la nouvel adresse du bloc pointé */
+        //printf("(((mlvalue*)stack[i])-1): 0x%lx,stack[i] : 0x%lx,(tab_mem_addr)[0][j]) : 0x%lx,(((tab_mem_addr)[1][j])-1) : 0x%lx\n",(((mlvalue*)stack[i])-1),stack[i],(tab_mem_addr)[0][j],(((tab_mem_addr)[1][j])-1) );
+        if((((mlvalue*)Caml_state->accu)-1)==(tab_mem_addr)[0][j]){
+          Caml_state->accu = (((tab_mem_addr)[1][j])+1);
+           
+          //printf("stack is modified\n");
+          break;
+        }
+      }
+    }
+  if(Is_block(Caml_state->env)){
+      
+      for(int j=0;j<cpt_obj_mem;j++){   /* recherche de la nouvel adresse du bloc pointé */
+        //printf("(((mlvalue*)stack[i])-1): 0x%lx,stack[i] : 0x%lx,(tab_mem_addr)[0][j]) : 0x%lx,(((tab_mem_addr)[1][j])-1) : 0x%lx\n",(((mlvalue*)stack[i])-1),stack[i],(tab_mem_addr)[0][j],(((tab_mem_addr)[1][j])-1) );
+        if((((mlvalue*)Caml_state->env)-1)==(tab_mem_addr)[0][j]){
+          Caml_state->env = (((tab_mem_addr)[1][j])+1);
+           
+          //printf("stack is modified\n");
+          break;
+        }
+      }
+    }
 
 }
 
@@ -209,7 +233,7 @@ void slide(mlvalue *** tab_mem_addr, int64_t nb_obj_mem){
     mlvalue* dst = (tab_mem_addr)[1][i]; /* new addr */
     int64_t size = Size_hd(*src); /* taille du block */
     if(src != dst){
-      for(int64_t i=0;i<size;i++){
+      for(int64_t i=0;i<size+1;i++){
         dst[i]=src[i];        /*on fait passer tout les element du bloque a leur nouvelle adresse */
       }
     }
@@ -287,7 +311,7 @@ void mark_and_compact(){
 int nb_alloc = 0;
 int nb_alloc_prec = 0;
 mlvalue* caml_alloc(size_t size) {
-  if(nb_alloc-nb_alloc_prec==5){
+  if(nb_alloc-nb_alloc_prec==50){
   //if((heap_free+size)*sizeof(mlvalue)>Heap_size){
     //printf("heap_free : %d\n",heap_free);
     //printf("on a marqué %d block\n",mark(Caml_state->stack)); //print_stack();
