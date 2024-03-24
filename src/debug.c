@@ -22,14 +22,14 @@ void print_stack(){
 void print_heap(){
     printf("______________________________\n");
     printf("| addresse block | valeur | head? | color? | taille |\n");
-    for(int i=0;(i*sizeof(mlvalue))<Heap_size;i++){
+    for(int i=0;(i*sizeof(mlvalue))<Caml_state->heap_size;i++){
         
         mlvalue *addr = (Caml_state->heap+i);
         mlvalue  content = *addr ;
         char* couleur = ((Color_hd(content)==WHITE)?"white":"black");
         int size = Size_hd(content);
-        if(Color_hd(content)==BLACK){
-        printf("\n| %p | %ld | yes | %s | %d | i : %d size_heap : %d \n",addr,content,couleur,size,i,Heap_size);
+        //if(Color_hd(content)==BLACK){
+        printf("\n| %p | %ld | yes | %s | %d | i : %d size_heap : %d \n",addr,content,couleur,size,i,Caml_state->heap_size);
         printf("| addresse | valeur | head? | is_block? | \n");
         for(int j = 0;j<size;j++){
             mlvalue *addr = (Caml_state->heap+i+j);
@@ -42,10 +42,9 @@ void print_heap(){
             }
         }
         
-        }
+        //}
         i+=size;
         
         
     }
-    
 }

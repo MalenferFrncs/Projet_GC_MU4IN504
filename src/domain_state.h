@@ -15,6 +15,9 @@ typedef struct _caml_domain_state {
   mlvalue env;
   /* accumulateur */
   mlvalue accu;
+
+  /*Facteur de multiplication de la taille après realloc*/
+  size_t heap_size;
 } caml_domain_state;
 
 /* The global state */
@@ -22,5 +25,7 @@ extern caml_domain_state* Caml_state;
 
 /* Initialisation function for |Caml_state| */
 void caml_init_domain();
+
+void caml_free_domain(); //Ajout pour libérer correctement la mémoire du tas et de la pile
 
 #endif

@@ -4,6 +4,7 @@
 #include "mlvalues.h"
 
 mlvalue* caml_alloc(size_t size);
+void caml_realloc(int64_t cpt_obj_mem);
 void mark_and_compact();
 
 #endif

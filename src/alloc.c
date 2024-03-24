@@ -319,19 +319,84 @@ void mark_and_compact(){
 
 int nb_alloc = 0;
 int nb_alloc_prec = 0;
-mlvalue* caml_alloc(size_t size) {
-  if(nb_alloc-nb_alloc_prec==50){
-  //if((heap_free+size)*sizeof(mlvalue)>Heap_size){
-    //printf("heap_free : %d\n",heap_free);
-    //printf("on a marqué %d block\n",mark(Caml_state->stack)); //print_stack();
-    //print_heap();
+mlvalue *caml_alloc(size_t size)
+{
+  if (heap_free + size >= (Caml_state->heap_size) / 8) // Les mlvalues étant des entiers 64 bits, le nombre de cases est égal à Heap_size/8
+  {
+  //if(nb_alloc-nb_alloc_prec==50){
+    // if((heap_free+size)*sizeof(mlvalue)>Heap_size){
+    // printf("heap_free : %d\n",heap_free);
+    // printf("on a marqué %d block\n",mark(Caml_state->stack)); //print_stack();
+    // print_heap();
+    //printf("Appel au GC\n");
     mark_and_compact();
-    //mlvalue m = *(Caml_state->Caml_state->heap+Heap_size*1000000000000);
+    // mlvalue m = *(Caml_state->Caml_state->heap+Heap_size*1000000000000);
     nb_alloc_prec = nb_alloc;
-  } 
-  //printf("on me demande un bloc de taille %d\n",size);
-  mlvalue *addr_block = Caml_state->heap+heap_free;
+    //while (heap_free + size >= (Caml_state->heap_size) / 8)
+    //{
+      //caml_realloc(nb_obj);
+    //}
+  }
+  // printf("on me demande un bloc de taille %d\n",size);
+  mlvalue *addr_block = Caml_state->heap + heap_free;
   heap_free += size;
   nb_alloc++;
   return addr_block;
+}
+
+void caml_realloc(int64_t cpt_obj_mem)
+{
+  printf("appel realloc\n");
+  mlvalue *old_heap = Caml_state->heap;
+  Caml_state->heap_size = Caml_state->heap_size * 2;
+  Caml_state->heap = realloc(Caml_state->heap, Caml_state->heap_size);
+  if (old_heap == Caml_state->heap)
+  {
+    // printf("rien à faire\n");
+    return; // Rien à faire
+  }
+  size_t decalage = ((void *)Caml_state->heap - (void *)old_heap) / 8;
+  // printf("old addr : %p, new addr : %p decalage %p\n", old_heap, Caml_state->heap, decalage);
+
+  mlvalue *heap_pointer = Caml_state->heap;
+  int64_t cpt_obj_vu = 0;
+
+  while (cpt_obj_vu < cpt_obj_mem)
+  { /* on parcours la memoire */
+    header_t head_block = *heap_pointer;
+    int64_t size = Size_hd(head_block);
+
+    for (int64_t i = 0; i < size; i++)
+    { /* parcours des valeurs du bloc */
+      if (Is_block((heap_pointer + 1)[i]))
+      { /* si on a un pointeur dans le bloc */
+        // Recalcul de l'adresse
+        // printf("\nancienne adresse %p\n",Ptr_val((heap_pointer + 1)[i]));
+        (heap_pointer + 1)[i] += decalage;
+        // printf("nouvelle adresse %p\n\n",Ptr_val((heap_pointer + 1)[i]));
+      }
+    }
+    cpt_obj_vu++;
+
+    heap_pointer += (size + 1);
+  }
+
+  for (int i = 0; i < Caml_state->sp; i++)
+  {
+    mlvalue *stack = Caml_state->stack;
+    if (Is_block(stack[i]))
+    {
+      // Recalcul de la nouvelle adresse : new = old + decalage (voir comment bien gérer l'arithmétique des pointeurs..)
+    }
+
+  } /* fin de la modif de la pile */
+
+  if (Is_block(Caml_state->accu))
+  {
+    // Recalcul de la nouvelle adresse : new = old + decalage (voir comment bien gérer l'arithmétique des pointeurs..)
+  }
+  if (Is_block(Caml_state->env))
+  {
+    // Recalcul de la nouvelle adresse : new = old + decalage (voir comment bien gérer l'arithmétique des pointeurs..)
+  }
 }

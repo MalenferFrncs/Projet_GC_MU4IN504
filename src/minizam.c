@@ -34,4 +34,6 @@ int main(int argc, char** argv) {
     printf("%s\n", res_str);
     free(res_str);
   }
+  caml_free_domain();   //On libère proprement tout l'espace alloué dans caml_init_domain()
+
 }
