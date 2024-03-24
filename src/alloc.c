@@ -118,29 +118,7 @@ int64_t calc_new_addr(mlvalue ***tab_mem_addr, int64_t cpt_obj_mem)
   {
     header_t head_block = *heap_pointer;
     int64_t size = Size_hd(head_block);
-    char *tag;
-    if (Tag_hd(head_block) == ENV_T)
-    {
-      tag = "env";
-    }
-    else
-    {
-      if (Tag_hd(head_block) == CLOSURE_T)
-      {
-        tag = "closure";
-      }
-      else
-      {
-        if (Tag_hd(head_block) == BLOCK_T)
-        {
-          tag = "block";
-        }
-        else
-        {
-          tag = "erreur";
-        }
-      }
-    }
+    
     if (Color_hd(head_block) == BLACK)
     {
       tab_mem_addr[0][i] = (mlvalue *)heap_pointer;     /*old addr*/
