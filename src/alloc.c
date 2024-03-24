@@ -270,7 +270,7 @@ void print_tab(mlvalue ***tab,int64_t taille){
   printf("\n ");
 }
 
-void mark_and_compact(){
+int mark_and_compact(){
   //printf("debut gc \n");
   //printf("heap_free :%d\n",heap_free);
   #ifdef DEBUG
@@ -314,7 +314,7 @@ void mark_and_compact(){
   //printf("fin slide \n");
   free_tab_addr(tab_mem_addr);
   //printf("fin gc \n");
-  
+  return nb_obj_mem;
 }
 
 int nb_alloc = 0;
@@ -329,13 +329,13 @@ mlvalue *caml_alloc(size_t size)
     // printf("on a marqué %d block\n",mark(Caml_state->stack)); //print_stack();
     // print_heap();
     //printf("Appel au GC\n");
-    mark_and_compact();
+    int nb_obj = mark_and_compact();
     // mlvalue m = *(Caml_state->Caml_state->heap+Heap_size*1000000000000);
     nb_alloc_prec = nb_alloc;
-    //while (heap_free + size >= (Caml_state->heap_size) / 8)
-    //{
-      //caml_realloc(nb_obj);
-    //}
+    while (heap_free + size >= (Caml_state->heap_size) / 8)
+    {
+      caml_realloc(nb_obj);
+    }
   }
   // printf("on me demande un bloc de taille %d\n",size);
   mlvalue *addr_block = Caml_state->heap + heap_free;
@@ -352,11 +352,11 @@ void caml_realloc(int64_t cpt_obj_mem)
   Caml_state->heap = realloc(Caml_state->heap, Caml_state->heap_size);
   if (old_heap == Caml_state->heap)
   {
-    // printf("rien à faire\n");
+    printf("rien à faire\n");
     return; // Rien à faire
   }
   size_t decalage = ((void *)Caml_state->heap - (void *)old_heap) / 8;
-  // printf("old addr : %p, new addr : %p decalage %p\n", old_heap, Caml_state->heap, decalage);
+  printf("old addr : %p, new addr : %p decalage %p\n", old_heap, Caml_state->heap, decalage);
 
   mlvalue *heap_pointer = Caml_state->heap;
   int64_t cpt_obj_vu = 0;
@@ -371,7 +371,7 @@ void caml_realloc(int64_t cpt_obj_mem)
       if (Is_block((heap_pointer + 1)[i]))
       { /* si on a un pointeur dans le bloc */
         // Recalcul de l'adresse
-        // printf("\nancienne adresse %p\n",Ptr_val((heap_pointer + 1)[i]));
+        printf("\nancienne adresse %p\n",Ptr_val((heap_pointer + 1)[i]));
         (heap_pointer + 1)[i] += decalage;
         // printf("nouvelle adresse %p\n\n",Ptr_val((heap_pointer + 1)[i]));
       }
