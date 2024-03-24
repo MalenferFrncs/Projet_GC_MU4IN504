@@ -20,14 +20,14 @@ mlvalue *caml_alloc(size_t size)
 #endif
     int nb_obj = mark_and_compact();
 
+#ifdef REALLOC
     while (heap_free + size >= (Caml_state->heap_size) / sizeof(mlvalue)) // Malloc n'a pas suffit...
     {
-#ifdef DEBUG
-      printf("Appel à realloc\n");
-#endif
       caml_realloc(nb_obj);
     }
+#endif
   }
+
   mlvalue *addr_block = Caml_state->heap + heap_free;
   heap_free += size;
   return addr_block;
@@ -239,6 +239,9 @@ void slide(mlvalue ***tab_mem_addr, int64_t nb_obj_mem)
 /*Fonction de réallocation du tas lorsque celui ci n'est pas assez grand*/
 void caml_realloc(int64_t cpt_obj_mem)
 {
+	#ifdef DEBUG_REALLOC
+	printf("appel à realloc");
+	#endif
   mlvalue *old_heap = Caml_state->heap;
   Caml_state->heap_size = Caml_state->heap_size * 2;
   Caml_state->heap = realloc(Caml_state->heap, Caml_state->heap_size);

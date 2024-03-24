@@ -21,8 +21,9 @@ afin de constater des exemples où le GC est appelé pour des petits exemples, i
 #define Stack_size (8 * MB)
 #define Heap_size ( 512*KB)
 
-/*Décommenter pour avoir les affichages à l'exécution des tests*/
+/*Décommenter pour avoir les affichages à l'exécution des tests, et pour que la réallocation dynamique se mette en marche*/
 //#define DEBUG
 //#define DEBUG_REALLOC
+//#define REALLOC
 
 #endif
