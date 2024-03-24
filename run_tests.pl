@@ -16,10 +16,10 @@ my %tests = (
     'appterm/facto_tailrec'       => '2432902008176640000',
     'appterm/fun_appterm'         => '1',
 
-    #'bench/list_1'                => '10000',
-    #'bench/list_2'                => '10000',
-    #'bench/list_3'                => '10000',
-    #'bench/list_4'                => '10000',
+    'bench/list_1'                => '10000',
+    'bench/list_2'                => '10000',
+    'bench/list_3'                => '10000',
+    'bench/list_4'                => '10000',
     'bench/list_5'                => '[1,[5,0]]',
     'bench/list_5'                => '[1,[5,0]]',
 
