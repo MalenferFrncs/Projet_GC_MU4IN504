@@ -2,6 +2,7 @@
 (* Note: without GC; with the naive version of the VM, this will
    probably use about 4.5GB or memory (ie, if you have less than that,
    change the "250" line 29 by something else) . *)
+(*Modification pour que les tests passent en un temps réaliste : la liste fait 10000 éléments et plus 100000*)
 
 let rec make_list_0 size acc =
   if size = 0 then acc

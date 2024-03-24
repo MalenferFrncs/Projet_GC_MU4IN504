@@ -1,5 +1,5 @@
 (* Goal: create a larger list using terminal reccursion *)
-
+(*Modification pour que les tests passent en un temps réaliste : la liste fait 10000 éléments et plus 1000000*)
 let rec make_list_0 size acc =
   if size = 0 then acc
   else make_list_0 (size - 1) (0 :: acc)

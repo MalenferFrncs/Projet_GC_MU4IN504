@@ -1,4 +1,5 @@
 (* Goal: create a few temporary lists that can be freed *)
+(*Modification pour que les tests passent en un temps réaliste : la liste fait 10000 éléments et plus 100000*)
 
 let rec make_list_0 size acc =
   if size = 0 then acc
