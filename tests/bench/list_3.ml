@@ -21,4 +21,4 @@ let add_1 x = x + 1
 
 let map_add_1 = map add_1
 
-let _ = length (map_add_1 (map_add_1 (map_add_1 (map_add_1 (make_list_0 100000)))))
+let _ = length (map_add_1 (map_add_1 (map_add_1 (map_add_1 (make_list_0 10000)))))

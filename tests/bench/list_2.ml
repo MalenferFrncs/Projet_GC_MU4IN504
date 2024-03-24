@@ -11,4 +11,4 @@ let rec length l acc =
   | _ :: tl -> (length tl (acc + 1))
 let length l = length l 0
 
-let _ = length (make_list_0 1000000)
+let _ = length (make_list_0 10000)

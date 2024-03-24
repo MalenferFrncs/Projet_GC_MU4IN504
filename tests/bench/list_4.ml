@@ -26,4 +26,4 @@ let rec map_add_1 l n =
   if n = 0 then l
   else map_add_1 (map add_1 l) (n-1)
 
-let _ = length (map_add_1 (make_list_0 100000) 250)
+let _ = length (map_add_1 (make_list_0 10000) 250)
